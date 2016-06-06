@@ -169,7 +169,7 @@ func (l *Logger) log(lvl Level, format *string, args ...interface{}) {
 
 	defaultBackendMutex.Lock()
 	defaultBackend.Log(lvl, 2+l.ExtraCalldepth, record)
-	defaultBackendMutex.Unock()
+	defaultBackendMutex.Unlock()
 }
 
 // Fatal is equivalent to l.Critical(fmt.Sprint()) followed by a call to os.Exit(1).
