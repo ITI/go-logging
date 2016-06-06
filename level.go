@@ -70,6 +70,7 @@ type moduleLeveled struct {
 	backend   Backend
 	formatter Formatter
 	once      sync.Once
+	mutex     sync.RWMutex
 }
 
 // AddModuleLevel wraps a log backend with knobs to have different log levels
@@ -81,6 +82,7 @@ func AddModuleLevel(backend Backend) LeveledBackend {
 		leveled = &moduleLeveled{
 			levels:  make(map[string]Level),
 			backend: backend,
+			mutex:   sync.RWMutex{},
 		}
 	}
 	return leveled
@@ -88,6 +90,9 @@ func AddModuleLevel(backend Backend) LeveledBackend {
 
 // GetLevel returns the log level for the given module.
 func (l *moduleLeveled) GetLevel(module string) Level {
+	l.mutex.RLock()
+	defer l.mutex.RUnlock()
+
 	level, exists := l.levels[module]
 	if exists == false {
 		level, exists = l.levels[""]
@@ -101,6 +106,8 @@ func (l *moduleLeveled) GetLevel(module string) Level {
 
 // SetLevel sets the log level for the given module.
 func (l *moduleLeveled) SetLevel(level Level, module string) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
 	l.levels[module] = level
 }
 
