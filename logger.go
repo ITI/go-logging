@@ -168,7 +168,7 @@ func (l *Logger) log(lvl Level, format *string, args ...interface{}) {
 	}
 
 	defaultBackendMutex.RLock()
-	defer defaultBackendMutex.Runlock()
+	defer defaultBackendMutex.RUnlock()
 	defaultBackend.Log(lvl, 2+l.ExtraCalldepth, record)
 }
 
